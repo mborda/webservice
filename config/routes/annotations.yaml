@@ -1,0 +1,7 @@
+controllers:
+    resource: ../../src/Controller/
+    type: annotation
+api_contrroller:
+    resource: ../../src/Controller/ApiController.php
+    prefix: /api
+    type: annotation
