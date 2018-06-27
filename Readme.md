@@ -13,8 +13,10 @@ composer require symfony/twig-bundle
 ```
 
 Para añadir el componente de base de datos
+```
 composer require doctrine/doctrine-bundle
 composer require doctrine-orm
+```
 
 ## Para crear un controlador
 php bin/console make:controller
