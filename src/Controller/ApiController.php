@@ -5,6 +5,7 @@ namespace App\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Doctrine\DBAL\Driver\Connection;
 
 class ApiController extends Controller
 {
@@ -25,44 +26,40 @@ class ApiController extends Controller
     /**
      * @Route("/libros", name="libros")
      */
-    public function index()
+    public function index(Connection $connection)
     {
-        $libros = $this->libros;
+        $libros = $connection->fetchAll("SELECT * FROM libros");
         return $this->json($libros);
     }
 
     /**
      * @Route("/libros/search/id/{id}")
      */
-    public function searchById($id)
+    public function searchById(Connection $connection, $id)
     {
-        $libros = array_filter($this->libros, function($el) use ($id) {
-            return $el["id"] == $id;
-        });
+        $libros = $connection->fetchAll("SELECT * FROM libros WHERE id = $id");
         return $this->json($libros);
     }
 
     /**
      * @Route("/libros/search/author/{autor}")
      */
-    public function searchByAuthor($autor)
+    public function searchByAuthor(Connection $connection, $autor)
     {
-        $libros = array_filter($this->libros, function($el) use ($autor) {
-            return strpos($el["autor"], $autor) !== false;
-        });
+        $libros = $connection->fetchAll("SELECT * FROM libros WHERE autor LIKE '%$autor%'");
         return $this->json($libros);
     }
 
     /**
      * @Route("/libros/search")
      */
-    public function search(Request $request)
+    public function search(Request $request, Connection $connection)
     {
         $filtros = json_decode($request->get("filters"));
-        $libros = $this->libros;
+        $libros = $connection->fetchAll("SELECT * FROM libros");
         foreach ($filtros as $clave => $valor) {
-            $libros = array_filter($this->libros, function($el) use ($clave, $valor) {
-                return strpos($el[$clave], $valor) !== false;
+            $libros = array_filter($this->libros, function ($el) use ($clave, $valor) {
+                return strpos(strtolower($el[$clave]), strtolower($valor)) !== false;
             });
         }
         
